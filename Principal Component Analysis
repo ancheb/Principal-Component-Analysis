@@ -1,0 +1,74 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+
+# Load the breast cancer dataset
+
+data = load_breast_cancer()
+df = pd.DataFrame(data.data, columns=data.feature_names)
+df['target'] = data.target
+
+# Separate features and target variable
+
+x = df.drop('target', axis=1)
+y = df['target']
+
+# Scale the data
+x_scaled = StandardScaler().fit_transform(x)
+
+# Apply PCA with 2 components
+
+pca = PCA(n_components=2)
+principal_components = pca.fit_transform(x_scaled)
+pca_df = pd.DataFrame(data=principal_components, columns=['principal component 1', 'principal component 2'])
+
+# Visualize the principal components
+
+plt.figure(figsize=(8, 6))
+plt.scatter(pca_df['principal component 1'], pca_df['principal component 2'], c=df['target'])
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.title('PCA of Breast Cancer Dataset')
+plt.show()
+
+# Split data into training and testing sets
+
+X_train, X_test, y_train, y_test = train_test_split(pca_df, df['target'], test_size=0.3, random_state=42)
+
+# Train a logistic regression model
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Make predictions and evaluate the model
+
+y_pred = model.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+print(classification_report(y_test, y_pred))
+
+# Explained variance ratio
+
+print("\nExplained Variance Ratio:", pca.explained_variance_ratio_)
+
+
+
+
+
+
+##This code performs the following steps:
+#Loads the dataset: Imports the breast cancer dataset from sklearn.datasets.
+#Preprocesses the data: Scales the features using StandardScaler.
+#Applies PCA: Reduces the dimensionality to 2 principal components.
+#Visualizes the components: Creates a scatter plot to show how the data is transformed.
+#Splits data: Divides the data into training and testing sets for model evaluation.
+#Trains a logistic regression model: Fits the model on the training data.
+#Evaluates the model: Predicts on the test set and prints the accuracy and classification report.
+#Prints explained variance: Shows how much variance is captured by each principal component.
+
+
+#This provides a complete solution to the problem, incorporating PCA, visualization, and logistic regression for prediction.
